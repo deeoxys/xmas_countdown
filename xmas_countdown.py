@@ -9,6 +9,7 @@ Replies to users that ask for a countdown.
 Stuff i need to do:
 TODO 1. Add presence with countdown, but avoid being rate-limited.
 TODO 2. Send a message when we join a server.
+TODO 3. Fix janky code (lines 106 - 114).
 """
 
 # import things
@@ -86,6 +87,7 @@ def formatCountdown():
     # does python need variables to be declared here? not sure.
     formatted_countdown = ""
 
+    # find what datetime it is right now.
     date = datetime.datetime.now()
 
     # Here we can set the date and time to count down to. This is nice and modular if i ever wanna reuse this code.
@@ -95,14 +97,14 @@ def formatCountdown():
     minToCountDownTo = 59
     secToCountDownTo = 59
 
-    # Logic.
+    # Logic. Compare the date we are counting to, to datetime that we got on line 91.
     months = str(monthToCountDownTo - int(date.strftime("%m")))
     days = str(dayToCountDownTo - int(date.strftime("%d")))
     hours = str(hourToCountDownTo - int(date.strftime("%H")))
     mins = str(minToCountDownTo - int(date.strftime("%M")))
     secs = str(secToCountDownTo - int(date.strftime("%S")))
 
-    # TODO fix this jank-fest of code, ideally before Christmas
+    # fix this jank-fest of code, ideally before Christmas
     if date.month == monthToCountDownTo and date.day > dayToCountDownTo and date.hour > hourToCountDownTo:
         formatted_countdown = "Wait till next year!"
 
@@ -118,6 +120,7 @@ def formatCountdown():
     # spit it back out. Again, i could probably just do this whole thing on one line but i forget python syntax.
     return formatted_countdown
 
+# so folk cant scoop the bot.
 def readKey():
     f = open("assets/.gitignore xmas_countdown.txt", "r")
     key = f.read()
@@ -127,5 +130,5 @@ def readKey():
 
     return key
 
-# try not to leak this. then other folk can mess with the bot.
+# start bot up.
 client.run(readKey())
