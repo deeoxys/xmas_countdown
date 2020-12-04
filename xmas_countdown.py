@@ -7,9 +7,9 @@ Prefix is "*".
 Replies to users that ask for a countdown.
 
 Stuff i need to do:
-TODO 1. Add presence with countdown, but avoid being rate-limited.
-TODO 2. Send a message when we join a server.
-TODO 3. Fix janky code (lines 106 - 114).
+TODO 1. Rewrite percentage logic to do it in seconds, not days.
+TODO 2. Add presence with countdown, but avoid being rate-limited.
+TODO 3. Send a message when we join a server.
 """
 
 # import things
@@ -21,7 +21,7 @@ import datetime
 import time
 #import threading
 
-# instance of class
+# instance
 client = discord.Client()
 
 @client.event
@@ -71,7 +71,6 @@ async def on_message(message):
         await message.channel.send(percent())
 
 
-
 # lots of unused code here. for future.
 """
 @client.event
@@ -97,43 +96,82 @@ def updateStatus():
           "Updating presence (" + str(formatCountdown() + ")"))
     updateStatusEvent()
 """
+def getDays():
+    # variables
+    dayThatXmasIs = 0
+    dayOfYear = 0
+
+    # if leap year
+    if calendar.isleap(datetime.datetime.now().year):
+        # these are the amount of days each month have
+        months = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    # if NOT leap year
+    else:
+        # these are the amount of days each month have
+        months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    # loop through the array and add them up
+    for month in months:
+        # add the days to variable
+        dayThatXmasIs += month
+
+    # take away 6, as 31th Dec - 25th Dec = 6 days. Now we know what day of the year xmas is. Reckon this is a bit over-engineered? Perhaps.
+    dayThatXmasIs -= 6
+
+    # add up all the days from the months that have passed
+    for i in range(datetime.datetime.now().month - 1):
+        dayOfYear += months[i]
+    # then add the current day of the month
+    dayOfYear += datetime.datetime.now().day
+
+    # return
+    return dayThatXmasIs - dayOfYear
+
+def getHrsMinsSecs():
+    # get hours mins secs to midnight TODAY
+    hours = str(23 - int(datetime.datetime.now().strftime('%H')))
+    mins = str(59 - int(datetime.datetime.now().strftime('%M')))
+    secs = str(59 - int(datetime.datetime.now().strftime('%S')))
+
+    # return
+    return hours, mins, secs
+
+# validate
+def validateCountdown():
+    # if days is negative we missed it.
+    if getDays() < 0:
+        validate = 0 # Missed christmas
+
+    # if days is 0 it is xmas
+    elif getDays() == 0:
+        validate = 1 # It is christmas
+
+    # otherwise we are still waiting on xmas
+    else:
+        validate = 2 # It is not christmas yet
+
+    return validate
+
+# format nicely
 def formatCountdown():
-    # does python need variables to be declared here? not sure.
+    # variables
     formatted_countdown = ""
 
-    # find what datetime it is right now.
-    date = datetime.datetime.now()
+    # check with function
+    outcome = validateCountdown()
 
-    # Here we can set the date and time to count down to. This is nice and modular if i ever wanna reuse this code.
-    monthToCountDownTo = 12
-    dayToCountDownTo = 24
-    hourToCountDownTo = 23
-    minToCountDownTo = 59
-    secToCountDownTo = 59
-    millisecToCountDownTO = 1000
-
-    # Logic. Compare the date we are counting to, to datetime that we got on line 91.
-    months = str(monthToCountDownTo - int(date.strftime("%m")))
-    days = str(dayToCountDownTo - int(date.strftime("%d")))
-    hours = str(hourToCountDownTo - int(date.strftime("%H")))
-    mins = str(minToCountDownTo - int(date.strftime("%M")))
-    secs = str(secToCountDownTo - int(date.strftime("%S")))
-    # millisecs = str(secToCountDownTo - int(date.strftime("%f")))
-
-    # fix this jank-fest of code, ideally before Christmas
-    if date.month == monthToCountDownTo and date.day > dayToCountDownTo and date.hour > hourToCountDownTo:
+    # if only python had switch statements :(
+    if outcome == 0:
         formatted_countdown = "Wait till next year!"
 
-    elif int(months) <= 0 and int(days) <= 0 and int(hours) <= 0 and int(mins) <= 0 and int(secs) <= 0:
-        formatted_countdown = "It is Christmas day!"
+    elif outcome == 1:
+        formatted_countdown = "Merry Christmas!"
 
-    else:
-        formatted_countdown = "It is " + months + " months, " + days + " days, " + hours + " hours, " + mins + " mins and " + secs + " seconds" " till Christmas."
-    #    formatted_countdown = "It is " + months + " months, " + days + " days, " + hours + " hours, " + mins + " mins, " + secs + " seconds and " + millisecs[:-3] + " milliseconds" + " till Christmas"
-    # print("[SUBTASK] " + str(datetime.datetime.now().strftime("%X")) + ": " +
-    #      "Formatting date as " + str(formatted_countdown))
+    elif outcome == 2:
+        # format
+        formatted_countdown = "It is " + str(getDays()-1) + " days, " + str(getHrsMinsSecs()[0]) + " hours, " + str(getHrsMinsSecs()[1]) + " minutes and " + str(getHrsMinsSecs()[2]) + " seconds till Christmas."
 
-    # spit it back out.
     return formatted_countdown
 
 def percent():
