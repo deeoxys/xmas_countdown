@@ -13,6 +13,8 @@ TODO 3. Fix janky code (lines 106 - 114).
 """
 
 # import things
+import calendar
+
 import discord
 from discord import *
 import datetime
@@ -24,8 +26,8 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    #await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=formatCountdown(getCountdown())))
-    #await updateStatusEvent()
+    # await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=formatCountdown(getCountdown())))
+    # await updateStatusEvent()
 
     # global varible very bad yes but idc
     global start_time
@@ -57,6 +59,18 @@ async def on_message(message):
 
         # acutally send the msg
         await message.channel.send(str(thiscountdown))
+
+    elif message.content == (prefix + "percentage") or message.content == (prefix + "pc"):
+        print("[INFO] " + str(datetime.datetime.now().strftime("%x %X")) + ": " +
+              "user " + str(message.author) + " requested percentage" + " in server " + str(message.guild) + " (" + str(message.channel) + ").")
+
+        print("[INFO] " + str(datetime.datetime.now().strftime("%x %X")) + ": " +
+              "replied with \"" + percent() + "\"")
+
+        # acutally send the msg
+        await message.channel.send(percent())
+
+
 
 # lots of unused code here. for future.
 """
@@ -96,6 +110,7 @@ def formatCountdown():
     hourToCountDownTo = 23
     minToCountDownTo = 59
     secToCountDownTo = 59
+    millisecToCountDownTO = 1000
 
     # Logic. Compare the date we are counting to, to datetime that we got on line 91.
     months = str(monthToCountDownTo - int(date.strftime("%m")))
@@ -103,6 +118,7 @@ def formatCountdown():
     hours = str(hourToCountDownTo - int(date.strftime("%H")))
     mins = str(minToCountDownTo - int(date.strftime("%M")))
     secs = str(secToCountDownTo - int(date.strftime("%S")))
+    # millisecs = str(secToCountDownTo - int(date.strftime("%f")))
 
     # fix this jank-fest of code, ideally before Christmas
     if date.month == monthToCountDownTo and date.day > dayToCountDownTo and date.hour > hourToCountDownTo:
@@ -112,13 +128,59 @@ def formatCountdown():
         formatted_countdown = "It is Christmas day!"
 
     else:
-        formatted_countdown = "It is " + months + " months, " + days + " days, " + hours + " hours, " + mins + " mins and " + secs + " seconds" + " till Christmas"
-
+        formatted_countdown = "It is " + months + " months, " + days + " days, " + hours + " hours, " + mins + " mins and " + secs + " seconds" " till Christmas."
+    #    formatted_countdown = "It is " + months + " months, " + days + " days, " + hours + " hours, " + mins + " mins, " + secs + " seconds and " + millisecs[:-3] + " milliseconds" + " till Christmas"
     # print("[SUBTASK] " + str(datetime.datetime.now().strftime("%X")) + ": " +
     #      "Formatting date as " + str(formatted_countdown))
 
-    # spit it back out. Again, i could probably just do this whole thing on one line but i forget python syntax.
+    # spit it back out.
     return formatted_countdown
+
+def percent():
+    #date = datetime.datetime.now()
+    date = datetime.datetime(2019, 12, 5, 13, 40, 55)
+    months = []
+    dayThatXmasIs = 0
+    dayOfYear = 0
+
+    # Here we can set the date and time to count down to. This is nice and modular if i ever wanna reuse this code.
+    dayToCountDownTo = 259
+
+    # if leap year
+    if calendar.isleap(date.year):
+        # these are the amount of days each month have
+        months = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+        # loop through the array and add them up
+        for month in months:
+            # add the days to variable
+            dayThatXmasIs += month
+
+        # take away 6, as 31 - 25 = 6. Now we know what day of the year xmas is. Reckon this is a bit over-engineered? Perhaps.
+        dayThatXmasIs - 6
+
+    # if NOT leap year
+    elif not calendar.isleap(date.year):
+        # these are the amount of days each month have
+        months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+        # loop through the array and add them up
+        for month in months:
+            # add the days to variable
+            dayThatXmasIs += month
+
+        # take away 6, as 31 - 25 = 6. Now we know what day of the year xmas is. Reckon this is a bit over-engineered? Perhaps.
+        dayThatXmasIs - 6
+
+    # add up all the days from the months that have passed
+    for i in range(date.month - 1):
+        dayOfYear += months[i]
+    # then add the current day of the month
+    dayOfYear + date.day
+
+    percentageToXmas = dayOfYear / dayThatXmasIs
+
+    return "It is " + str(round(percentageToXmas * 100, 2)) + "% of the way to Christmas."
 
 # so folk cant scoop the bot.
 def readKey():
