@@ -65,10 +65,10 @@ async def on_message(message):
               "user " + str(message.author) + " requested percentage" + " in server " + str(message.guild) + " (" + str(message.channel) + ").")
 
         print("[INFO] " + str(datetime.datetime.now().strftime("%x %X")) + ": " +
-              "replied with \"" + percent() + "\"")
+              "replied with \"" + formatPercentage() + "\"")
 
         # acutally send the msg
-        await message.channel.send(percent())
+        await message.channel.send(formatPercentage())
 
 
 # lots of unused code here. for future.
@@ -174,51 +174,59 @@ def formatCountdown():
 
     return formatted_countdown
 
-def percent():
-    #date = datetime.datetime.now()
-    date = datetime.datetime(2019, 12, 5, 13, 40, 55)
-    months = []
-    dayThatXmasIs = 0
+def calculatePercentage():
+    # date = datetime.datetime.now()
+    #date = datetime.datetime(2019, 12, 24, 23, 0, 0)
     dayOfYear = 0
 
-    # Here we can set the date and time to count down to. This is nice and modular if i ever wanna reuse this code.
-    dayToCountDownTo = 259
-
     # if leap year
-    if calendar.isleap(date.year):
+    if calendar.isleap(datetime.datetime.now().year):
         # these are the amount of days each month have
         months = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-        # loop through the array and add them up
-        for month in months:
-            # add the days to variable
-            dayThatXmasIs += month
-
-        # take away 6, as 31 - 25 = 6. Now we know what day of the year xmas is. Reckon this is a bit over-engineered? Perhaps.
-        dayThatXmasIs - 6
+        secThatXmasIs = 31104000
 
     # if NOT leap year
-    elif not calendar.isleap(date.year):
+    else:
         # these are the amount of days each month have
         months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-        # loop through the array and add them up
-        for month in months:
-            # add the days to variable
-            dayThatXmasIs += month
-
-        # take away 6, as 31 - 25 = 6. Now we know what day of the year xmas is. Reckon this is a bit over-engineered? Perhaps.
-        dayThatXmasIs - 6
+        secThatXmasIs = 31017600
 
     # add up all the days from the months that have passed
-    for i in range(date.month - 1):
+    for i in range(datetime.datetime.now().month - 1):
         dayOfYear += months[i]
     # then add the current day of the month
-    dayOfYear + date.day
+    dayOfYear += datetime.datetime.now().day
 
-    percentageToXmas = dayOfYear / dayThatXmasIs
+    secOfYear = (dayOfYear * 24 * 60 * 60) + (datetime.datetime.now().hour * 60 * 60) + (datetime.datetime.now().minute * 60) + datetime.datetime.now().second
 
-    return "It is " + str(round(percentageToXmas * 100, 2)) + "% of the way to Christmas."
+    percentageToXmas = secOfYear / secThatXmasIs
+
+    return percentageToXmas
+
+def validatePercentage():
+    outcome = calculatePercentage()
+
+    if outcome > 100.00:
+        validate = True
+
+    elif outcome <= 100.00:
+        validate = False
+
+    # boolean to say if we missed chistmas or not
+    return validate
+
+def formatPercentage():
+    formattedPercentage = ""
+    outcome = validatePercentage()
+
+    if outcome:
+       formattedPercentage = "Wait till next year!"
+
+    else:
+        formattedPercentage = "It is " + str(round(calculatePercentage() * 100, 5)) + "% of the way to Christmas."
+
+    return formattedPercentage
+
 
 # so folk cant scoop the bot.
 def readKey():

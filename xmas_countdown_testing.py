@@ -5,7 +5,7 @@ from time import sleep
 
 global date
 # simulate date and time for testing
-date = datetime.datetime(2020, 1, 1, 0, 0, 0)
+date = datetime.datetime(2020, 1, 1, 0, 0, 56)
 
 # obsolete code
 """
@@ -150,6 +150,59 @@ def formatCountdown():
 
     return formatted_countdown
 
+def calculatePercentage():
+    # date = datetime.datetime.now()
+    #date = datetime.datetime(2019, 12, 24, 23, 0, 0)
+    dayOfYear = 0
+
+    # if leap year
+    if calendar.isleap(date.year):
+        # these are the amount of days each month have
+        months = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        secThatXmasIs = 31104000
+
+    # if NOT leap year
+    else:
+        # these are the amount of days each month have
+        months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        secThatXmasIs = 31017600
+
+    # add up all the days from the months that have passed
+    for i in range(date.month - 1):
+        dayOfYear += months[i]
+    # then add the current day of the month
+    dayOfYear += date.day
+
+    secOfYear = (dayOfYear * 24 * 60 * 60) + (date.hour * 60 * 60) + (date.minute * 60) + date.second
+
+    percentageToXmas = secOfYear / secThatXmasIs
+
+    return percentageToXmas
+
+def validatePercentage():
+    outcome = calculatePercentage()
+
+    if outcome > 100.00:
+        validate = True
+
+    elif outcome <= 100.00:
+        validate = False
+
+    # boolean to say if we missed chistmas or not
+    return validate
+
+def formatPercentage():
+    formattedPercentage = ""
+    outcome = validatePercentage()
+
+    if outcome:
+       formattedPercentage = "Wait till next year!"
+
+    else:
+        formattedPercentage = "It is " + str(round(calculatePercentage() * 100, 5)) + "% of the way to Christmas."
+
+    return formattedPercentage
+
 # loop for testing
 def loop():
     while True:
@@ -161,50 +214,16 @@ def loop():
 def main():
     xyz = input(">>>")
 
-    if xyz == "*countdown" or "*cd":
-        thiscountdown = formatCountdown()
+    if xyz == "*countdown" or xyz == "*cd":
         print("[INFO] " + str(datetime.datetime.now().strftime("%x %X")) + ": "
-              + str(thiscountdown))
-        #threading.Timer(1, main).start()
+              + str(formatCountdown()))
 
-    if xyz == "go":
+    elif xyz == "*percent" or xyz == "*pc":
+        print("[INFO] " + str(datetime.datetime.now().strftime("%x %X")) + ": "
+              + str(formatPercentage()))
+
+    elif xyz == "go":
         loop()
-
-# rewite this in seconds
-def percent():
-    # date = datetime.datetime.now()
-    date = datetime.datetime(2019, 12, 25)
-    months = []
-    dayThatXmasIs = 0
-    dayOfYear = 0
-
-    # if leap year
-    if calendar.isleap(date.year):
-        # these are the amount of days each month have
-        months = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-    # if NOT leap year
-    else:
-        # these are the amount of days each month have
-        months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-    # loop through the array and add them up
-    for month in months:
-        # add the days to variable
-        dayThatXmasIs += month
-
-    # take away 6, as 31th Dec - 25th Dec = 6 days. Now we know what day of the year xmas is. Reckon this is a bit over-engineered? Perhaps.
-    dayThatXmasIs -= 6
-
-    # add up all the days from the months that have passed
-    for i in range(date.month - 1):
-        dayOfYear += months[i]
-    # then add the current day of the month
-    dayOfYear += date.day
-
-    percentageToXmas = dayOfYear / dayThatXmasIs
-
-    print("It is " + str(round(percentageToXmas * 100, 2)) + "% of the way to Christmas.")
 
 # yeajh
 def readKey():
@@ -215,6 +234,9 @@ def readKey():
     return key
 
 #percent()
-# print(readKey())
+#print(readKey())
 #print(CountdownRewrite())
-print(formatCountdown())
+#print(formatCountdown())
+#print(calculatePercentage())
+#print(formatPercentage())
+main()
