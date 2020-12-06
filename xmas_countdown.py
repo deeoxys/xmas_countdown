@@ -7,9 +7,8 @@ Prefix is "*".
 Replies to users that ask for a countdown.
 
 Stuff i need to do:
-TODO 1. Rewrite percentage logic to do it in seconds, not days.
-TODO 2. Add presence with countdown, but avoid being rate-limited.
-TODO 3. Send a message when we join a server.
+TODO 1. Add presence with countdown, but avoid being rate-limited.
+TODO 2. Send a message when we join a server.
 """
 
 # import things
