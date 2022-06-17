@@ -1,5 +1,5 @@
 """
-DISCORD BOT WRITTEN BY r333mo ON 01/12/2020
+DISCORD BOT WRITTEN ON 01/12/2020
 VERY SCUFFED CODE
 
 This bot is a Christmas Countdown.
@@ -76,7 +76,7 @@ async def on_message(message):
 async def on_guild_join(server):
     for textchannel in server.channels:
         if "general" in textchannel.name:
-            await message.channel.send("Hello I am r333mo's Christas Countdown bot.\nYou can use *countdown or *cd to see how long it is till Christmas.")
+            await message.channel.send("Hello I am Christas Countdown bot.\nYou can use *countdown or *cd to see how long it is till Christmas.")
 """
 """
 async def updateStatusEvent():
