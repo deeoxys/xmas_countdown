@@ -229,7 +229,7 @@ def formatPercentage():
 
 # so folk cant scoop the bot.
 def readKey():
-    f = open("assets/.gitignore xmas_countdown.txt", "r")
+    f = open("key.txt", "r")
     key = f.read()
     print("[INFO] " + str(datetime.datetime.now().strftime("%x %X")) + ": " +
           "Opened file " + f.name + " got key (" + key + ").")
