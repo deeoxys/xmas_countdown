@@ -1,3 +1,5 @@
+#!/bin/python3
+
 """
 DISCORD BOT WRITTEN ON 01/12/2020
 VERY SCUFFED CODE
@@ -21,7 +23,7 @@ import time
 #import threading
 
 # instance
-client = discord.Client()
+client = discord.Client(intents = discord.Intents.all())
 
 @client.event
 async def on_ready():
